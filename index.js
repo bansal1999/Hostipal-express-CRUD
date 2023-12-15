@@ -57,20 +57,36 @@ app.put("/", (req, res) => {
 });
 
 app.delete("/", (req, res) => {
-  const newKidney = [];
+  if (isThereAtleastOneHealthyKidney()) {
+    const newKidney = [];
+    for (let i = 0; i < users[0].kidneys.length; i++) {
+      if (users[0].kidneys.healthy) {
+        newKidney.push({
+          healthy: true,
+        });
+      }
+    }
+    users[0].kidneys = newKidney;
+    res.json({
+      msg: "Data deleted",
+    });
+  } else {
+    res.status(411).json({
+      msg: "You have no bad kidneys",
+    });
+  }
+});
+
+function isThereAtleastOneHealthyKidney() {
+  let atleastOneUnhealthyKidney = false;
   for (let i = 0; i < users[0].kidneys.length; i++) {
-    if (users[0].kidneys.healthy) {
-      newKidney.push({
-        healthy: true,
-      });
+    if (!users[0].kidneys[i].healthy) {
+      atleastOneUnhealthyKidney = true;
     }
   }
+  return atleastOneUnhealthyKidney;
+}
 
-  users[0].kidneys = newKidney;
-  res.json({
-    msg: "Data deleted",
-  });
-});
 app.listen(3000, () => {
   console.log("Express server initialized");
 });
